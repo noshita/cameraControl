@@ -43,14 +43,19 @@ def get_serialnum(port):
     lines = [line for line in output]
     serialnum = lines[2].decode('utf-8')
     m = PTN_SERIALNUM.match(serialnum)
-    serialnum = m.group("serialnum")
-    return serialnum
+    print(m)
+    if m is not None:
+        serialnum = m.group("serialnum")
+        return serialnum
+    else:
+        return None
 
 def get_list_serialnumber(list_ports):
     list_serialnum = []
     for port in list_ports:
         serialnum = get_serialnum(port)
-        list_serialnum.append(serialnum)
+        if serialnum is not None:
+            list_serialnum.append(serialnum)
     return list_serialnum
 
 #
