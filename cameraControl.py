@@ -3,6 +3,9 @@
 
 import subprocess, re, csv, os, shutil
 from datetime import datetime
+from time import time
+
+from joblib import Parallel, delayed
 
 #
 # Common
@@ -83,22 +86,34 @@ def get_list_files(port):
             list_file.append([m.group("num"), m.group("filename")])
     return list_file
 
+def get_all_images_fromACamera(camera, outputPath_input, overwrite=False):
+    
+    name, serialnum, port = camera
+
+    outputPath = os.path.abspath(outputPath_input)
+    if not os.path.exists(outputPath):
+        os.mkdir(outputPath)
+    elif overwrite:
+        shutil.rmtree(outputPath)
+        os.mkdir(outputPath)
+    else:
+        shutil.rmtree(outputPath)
+        os.mkdir(outputPath)
+    print(camera)
+    # subprocess.run(["gphoto2", "--port", port, "--get-all-files", "--filename", name +"/%04n.%C"])
+    subprocess.Popen(" ".join(["gphoto2", "--port", port, "--get-all-files", "--filename", name +"/%04n.%C"]), shell=True)
+
 def get_all_images(list_cameras, outputPath, overwrite=False):
+    start = time()
     cwd = os.getcwd()
     wd = os.path.normpath(os.path.join(cwd, outputPath))
     if not os.path.exists(wd):
         os.mkdir(wd)
     os.chdir(wd)
-    for camera in list_cameras:
-        camDirPath = os.path.join(wd,camera[0])
-        if not os.path.exists(camDirPath):
-            os.mkdir(camDirPath)
-        else:
-            shutil.rmtree(camDirPath)
-            os.mkdir(camDirPath)
-        print(camera)
-        subprocess.run(["gphoto2", "--port", camera[2], "--get-all-files", "--filename", camera[0] +"/%04n.%C"])
+    # Parallel(n_jobs=-1, verbose=10)( [delayed(get_all_images_fromACamera(camera, os.path.join(wd,camera[0]))) for camera in list_cameras] )
+    [get_all_images_fromACamera(camera, os.path.join(wd,camera[0])) for camera in list_cameras]
     os.chdir(cwd)
+    # print('Done. ({} sec)'.format(time() - start))
 
 
 #
