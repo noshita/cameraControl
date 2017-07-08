@@ -8,13 +8,18 @@ from time import time
 from joblib import Parallel, delayed
 
 #
+# Env
+#
+KEY_SERIALNUM = "eosserialnumber"
+
+#
 # Common
 #
 def get_lines(cmd):
     '''
-    :param cmd: str 実行するコマンド.
+    :param cmd: str 実行するコマンド
     :rtype: generator
-    :return: 標準出力 (行毎).
+    :return: 標準出力 (行毎)
     '''
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
@@ -25,6 +30,7 @@ def get_lines(cmd):
 
         if not line and proc.poll() is not None:
             break
+
 #
 # Ports
 #
@@ -41,8 +47,8 @@ def get_list_ports():
 # Serial Numbers
 #
 PTN_SERIALNUM = re.compile("Current:\s+(?P<serialnum>\d+)")
-def get_serialnum(port):
-    output = get_lines("gphoto2 --port " + port + " --get-config eosserialnumber")
+def get_serialnum(port, key_serialnum = KEY_SERIALNUM):
+    output = get_lines("gphoto2 --port " + port + " --get-config "+key_serialnum)
     lines = [line for line in output]
     serialnum = lines[2].decode('utf-8')
     m = PTN_SERIALNUM.match(serialnum)
@@ -62,7 +68,7 @@ def get_list_serialnumber(list_ports):
     return list_serialnum
 
 #
-# 画像の取得
+# Get Images
 #
 def genListCameras(list_camera_numbers, list_ports):
     list_cameras = []
