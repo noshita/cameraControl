@@ -49,9 +49,9 @@ def get_list_ports():
 PTN_SERIALNUM = re.compile("Current:\s+(?P<serialnum>\d+)")
 def get_serialnum(port, key_serialnum = KEY_SERIALNUM):
     output = get_lines("gphoto2 --port " + port + " --get-config "+key_serialnum)
-    lines = [line for line in output]
-    serialnum = lines[2].decode('utf-8')
-    m = PTN_SERIALNUM.match(serialnum)
+    lines = [line.decode('utf-8') for line in output]
+    serialnum = "\n".join(lines)
+    m = PTN_SERIALNUM.search(serialnum)
     print(m)
     if m is not None:
         serialnum = m.group("serialnum")
@@ -137,12 +137,14 @@ def get_all_images(list_cameras, outputPath, overwrite=False):
 # Choice: 9 RAW
 #
 def set_imageformat(port, formatNum):
-    output = get_lines("gphoto2 --port " + port + " --set-config imageformat="+str(formatNum))
-    return [line for line in output]
+    # output = get_lines("gphoto2 --port " + port + " --set-config imageformat="+str(formatNum))
+    # return [line for line in output]
+    subprocess.Popen(" ".join(["gphoto2", "--port", port, "--set-config", "imageformat="+str(formatNum)]), shell=True)
 
 def set_allCameras_imageformat(list_ports, formatNum):
-    for port in list_ports:
-        set_imageformat(port, formatNum)
+    # for port in list_ports:
+    #     set_imageformat(port, formatNum)
+    [set_imageformat(port) for port in list_ports]
     return 0
 
 
@@ -150,12 +152,14 @@ def set_allCameras_imageformat(list_ports, formatNum):
 # format SD Cards
 #
 def delete_all_files(port):
-    output = get_lines("gphoto2 --port " + port + " --delete-all-files --recurse")
-    return [line for line in output]
+    # output = get_lines("gphoto2 --port " + port + " --delete-all-files --recurse")
+    # return [line for line in output]
+    subprocess.Popen(" ".join(["gphoto2", "--port", port, "--delete-all-files", "--recurse"]), shell=True)
 
 def delete_all_files_inAllCameras(list_ports):
-    for port in list_ports:
-        delete_all_files(port)
+    # for port in list_ports:
+    #     delete_all_files(port)
+    [delete_all_files(port) for port in list_ports]
     return 0    
 
 #
@@ -172,5 +176,6 @@ def check_clocks(list_ports):
         print(dt.isoformat())
 def set_clocks_now(list_ports):
     for port in list_ports:
-        output = get_lines("gphoto2 --port " + port + " --set-config datetime=now")
-        lines = [line for line in output]
+        # output = get_lines("gphoto2 --port " + port + " --set-config datetime=now")
+        # lines = [line for line in output]
+        subprocess.Popen(" ".join(["gphoto2", "--port", port, "--set-config", "datetime=now"]), shell=True)
