@@ -142,7 +142,8 @@ def set_imageformat(port, formatNum):
 def set_allCameras_imageformat(list_ports, formatNum):
     # for port in list_ports:
     #     set_imageformat(port, formatNum)
-    [set_imageformat(port) for port in list_ports]
+    
+    [set_imageformat(port, formatNum) for port in list_ports]
     return 0
 
 
@@ -150,9 +151,9 @@ def set_allCameras_imageformat(list_ports, formatNum):
 # format SD Cards
 #
 def delete_all_files(port):
-    # output = get_lines("gphoto2 --port " + port + " --delete-all-files --recurse")
-    # return [line for line in output]
-    subprocess.Popen(" ".join(["gphoto2", "--port", port, "--delete-all-files", "--recurse"]), shell=True)
+    output = get_lines("gphoto2 --port " + port + " --delete-all-files --recurse")
+    return [line for line in output]
+    # subprocess.Popen(" ".join(["gphoto2", "--port", port, "--delete-all-files", "--recurse"]), shell=True)
 
 def delete_all_files_inAllCameras(list_ports):
     # for port in list_ports:
