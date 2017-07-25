@@ -36,9 +36,7 @@ def get_lines(cmd):
 #
 def get_list_ports():
     output = get_lines("gphoto2 --auto-detect")
-    list_ports = []
-    for line in output:
-        list_ports.append(line.decode('utf-8'))
+    list_ports = [line.decode('utf-8') for line in output]
     list_ports=list_ports[2:]
     list_ports = [re.split("\s\s+", port)[1] for port in list_ports]
     return list_ports
